@@ -11,6 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,18 +67,29 @@ public class DefaultJsonParser<T> implements JsonParser<T> {
     @Override
     public String parseToJson(T t) {
 //        TODO: Realize that
+        final StringBuilder jsonSb = new StringBuilder().append(OPEN_FIGURE_BRACKET);
+
         Field[] declaredFields = t.getClass().getDeclaredFields();
         for (Field field : declaredFields) {
             field.setAccessible(true);
             try {
-                Object fieldValue = field.get(t);
-                System.out.println("---");
+                String fieldName = field.getName();
+                Object value = field.get(t);
+                String fieldValue = "";
+
+                if (field.getType().isPrimitive()) {
+                    String primitiveName = field.getType().getName();
+                    fieldValue = PrimitiveUtil.getStringFromPrimitiveValue(primitiveName, value);
+                    jsonSb.append(String.format("\"%s\":%s,", fieldName, fieldValue));
+                } else {
+                    jsonSb.append(String.format("\"%s\":\"%s\",", fieldName, value.toString()));
+                }
+
             } catch (IllegalAccessException e) {
-                throw new BusinessException("sfdvbgdgsf");
+                throw new BusinessException("exception occurred during getting values to fields");
             }
         }
-//        declaredFields[0].getName()
-        return null;
+        return jsonSb.append(CLOSE_FIGURE_BRACKET).toString();
     }
 
     private void arrayProcessing(ReflectionService<T> reflectionService,
