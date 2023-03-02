@@ -1,7 +1,7 @@
 package service;
 
 import exception.BusinessException;
-import util.JsonSeparatorUtil;
+import util.JsonProcessorUtil;
 import util.PrimitiveUtil;
 
 import java.lang.reflect.Field;
@@ -25,8 +25,9 @@ public class DefaultJsonParser<T> implements JsonParser<T> {
 
     @Override
     public T parseToObject(String json, Class<?> clazz) {
-        final Map<String, String> fieldValueData = JsonSeparatorUtil.createFieldValueData(json);
         final ReflectionService<T> reflectionService = new ReflectionService<>();
+
+        final Map<String, String> fieldValueData = JsonProcessorUtil.createFieldValueData(json);
         T newInstance = reflectionService.createEmptyInstance(clazz);
         try {
             Field[] fields = newInstance.getClass().getDeclaredFields();

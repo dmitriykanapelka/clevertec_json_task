@@ -1,5 +1,7 @@
 package util;
 
+import exception.BusinessException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,8 +14,7 @@ import static util.Constants.OPEN_ARRAY_BRACKET;
 import static util.Constants.OPEN_FIGURE_BRACKET;
 import static util.Constants.QUOTATION_MARK;
 
-public class JsonSeparatorUtil {
-
+public class JsonProcessorUtil {
 
     public static Map<String, String> createFieldValueData(String json) {
         json = json.substring(1, json.length() - 2);
@@ -55,6 +56,9 @@ public class JsonSeparatorUtil {
                 continue;
             }
             currentValue.append(symbol);
+        }
+        if (figureBracketCounter != 0 || squareBracketCounter != 0) {
+            throw new BusinessException("Invalid token");
         }
         return fieldValueData;
     }
